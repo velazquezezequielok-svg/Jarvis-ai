@@ -3,11 +3,11 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: { message: 'Falta configurar ANTHROPIC_API_KEY en Netlify.' } })
+      body: JSON.stringify({ error: { message: 'Falta configurar GEMINI_API_KEY en Netlify.' } })
     };
   }
 
@@ -18,20 +18,17 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ error: { message: 'Body inválido' } }) };
   }
 
+  const model = 'gemini-2.0-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: payload.model || 'claude-sonnet-4-6',
-        max_tokens: payload.max_tokens || 1000,
-        system: payload.system,
-        tools: payload.tools,
-        messages: payload.messages
+        system_instruction: payload.systemInstruction,
+        contents: payload.contents,
+        tools: payload.tools
       })
     });
 
@@ -44,7 +41,7 @@ exports.handler = async function (event) {
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: { message: 'Error al conectar con Anthropic: ' + err.message } })
+      body: JSON.stringify({ error: { message: 'Error al conectar con Gemini: ' + err.message } })
     };
   }
 };
