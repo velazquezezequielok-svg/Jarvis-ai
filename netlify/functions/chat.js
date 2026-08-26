@@ -18,7 +18,7 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ error: { message: 'Body inválido' } }) };
   }
 
-  const model = 'gemini-2.0-flash';
+  const model = 'gemini-3.6-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
